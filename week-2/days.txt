@@ -1,0 +1,4 @@
+weekend:pub, git, cli
+1 day:
+atmel, cpu ram, logic gates
+cli git

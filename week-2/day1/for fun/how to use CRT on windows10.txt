@@ -1,0 +1,23 @@
+1. install Linux bash shell
+
+https://www.howtogeek.com/249966/how-to-install-and-use-the-linux-bash-shell-on-windows-10/
+
+2. install Cool-Retro-Term
+
+https://itsfoss.com/cool-retro-term/ (64 bit)
+
+or use the files
+
+3. install xming and run
+
+simple installation
+
+4. run cool-retro-term in winfos bash shell
+
+https://www.howtogeek.com/261575/how-to-run-graphical-linux-desktop-applications-from-windows-10s-bash-shell/
+
+5. it comes up, but cannot write or do things in it
+
+6. ideas from GitHub (With Cygwin)
+
+https://github.com/Swordfish90/cool-retro-term/issues/40
