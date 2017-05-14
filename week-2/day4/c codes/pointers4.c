@@ -10,8 +10,8 @@ int main()
     //TODO:
     // The "number_pointer" should point to the first element of the array called "numbers",
     // than please print its value with it.
+    number_pointer = &numbers[0];
+    printf("%d", *number_pointer);
 
-
-    printf("%p", &number_pointer[0]);
     return 0;
 }

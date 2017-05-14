@@ -1,5 +1,5 @@
-#include <stdio.h>
-#include <stdio.h>
+#include<stdio.h>
+#include <stdlib.h>
 
 /* Write a void function which has two float parameters. The function can do the
 totoro operation on those parameters and it also prints out the result of the operation
@@ -8,21 +8,18 @@ The totoro operation does the following on two variables (let's say we have "a"
  and "b")
 result = a*b+(a+b)+a*a*a+b*b*b+3.14159265358979
 */
-float TotoroOp ();
-int main(){
+void totoroop(float, float);
 
-    TotoroOp ();
+int main() {
+
+    float d = 9.81;
+    float c = 10;
+
+    totoroop(d, c);
 
     return 0;
 }
-float TotoroOp ()
-{
-    float aaa=1;
-    float bbb=2;
-    float result = aaa*bbb+(aaa+bbb)+aaa*aaa*aaa+bbb*bbb*bbb+3.14159265358979;
+void totoroop(float a, float b) {
 
-    printf("The result is %f", result);
-
-    return ;
-
+    printf("%f",  a*b+(a+b)+a*a*a+b*b*b+3.14159265358979);
 }

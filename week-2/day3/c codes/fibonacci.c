@@ -1,28 +1,23 @@
-
-#include <stdio.h>
-#include <stdio.h>
+#include<stdio.h>
+#include <stdlib.h>
 
 /* Write a non void function which has a paramters (let's say for example x).
 The funtion than returns the "xth" fibonaci number.
 What the hack is a fibonacci number? Search it on wikipedia!
 */
 
-int main()
-{
+int fib(int);
 
-    int FibonacciNum= Fibonacci();
+int main() {
 
-    printf("The Fibonacci Number is",FibonacciNum);
+    int xth_fib_num = fib(5);
+    printf("%d", xth_fib_num);
+
     return 0;
 }
 
-int Fibonacci ()
-{
-    int n
-    while ()
-        int xn1=0
-        int xn2=1
-
-        int xth = x
-    return xth;
+int fib(int x) {
+    if (x <= 1)
+        return x;
+    return fib(x-1) + fib(x-2);
 }
