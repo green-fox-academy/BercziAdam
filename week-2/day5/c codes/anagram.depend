@@ -1,6 +1,0 @@
-# depslib dependency file v1.0
-1494598140 source:c:\users\adam\desktop\greenfox\bercziadam\week-2\day5\anagram\main.c
-	<stdio.h>
-	<stdlib.h>
-	<string.h>
-
