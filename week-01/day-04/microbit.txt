@@ -1,0 +1,46 @@
+input.onButtonPressed(Button.A, () => {
+
+})
+basic.forever(() => {
+    basic.showArrow(ArrowNames.North)
+    basic.pause(1000)
+    basic.clearScreen()
+})
+
+let ypix = 0
+let xpix = 0
+
+basic.forever(() => {
+    xpix = input.rotation(Rotation.Roll) / -5
+    if (xpix > 2) {
+        xpix = 2
+    }
+    if (xpix <= -2) {
+        xpix = -2
+    }
+    ypix = input.rotation(Rotation.Pitch) / -5
+    if (ypix > 2) {
+        ypix = 2
+    }
+    if (ypix <= -2) {
+        ypix = -2
+    }
+    basic.clearScreen()
+    led.plot(xpix + 2, ypix + 2)
+})
+
+basic.forever(() => {
+    if (Math.abs(input.acceleration(Dimension.Z)) <= 500) {
+        basic.showNumber(Math.abs(input.acceleration(Dimension.Z)))
+    } else {
+        basic.showNumber(0)
+    }
+})
+
+radio.onDataPacketReceived(({receivedString}) => {
+    basic.showString(receivedString)
+})
+basic.forever(() => {
+
+})
+radio.setGroup(10)

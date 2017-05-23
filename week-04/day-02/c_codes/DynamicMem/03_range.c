@@ -16,51 +16,44 @@
  *
  * It should delete any dynamically allocated resource before the program exits.
  */
-int *range(int from,int to,int step);
+int *range(int from, int to, int step);
 int main()
 {
-
-    int from=0;
-    int to=1100;
-    int step=3;
+    int from = 0;
+    int to = 1100;
+    int step = 3;
     int n;
     int i;
-
-    if (to%step==0) {
-        n=(float)to/step-1;
+    if (to % step == 0) {
+        n = (float)to / step - 1;
     } else {
-        n=floor((float)to/step);
+        n = floor((float)to / step);
     }
-    int *prt=range(from, to, step);
-    for (i=0; i<n; i++) {
-
-        printf("%d\n",*(prt+i));
+    int *prt = range(from, to, step);
+    for (i = 0; i < n; i ++) {
+        printf("%d\n",*(prt + i));
     }
-
     free(prt);
     return 0;
 }
 
-int *range(int from,int to,int step)
+int *range(int from, int to, int step)
 {
     int n;
     int i;
-
-    int* pointer=NULL;
-
-    if (to%step==0) {
-        n=(float)to/step-1;
+    int* pointer = NULL;
+    if (to % step == 0) {
+        n = (float)to / step - 1;
     } else {
-        n=floor((float)to/step);
+        n = floor((float)to / step);
     }
-    pointer= (int*) calloc((n), sizeof(int));
-    if(pointer == NULL) {
+    pointer = (int*) calloc((n), sizeof(int));
+    if (pointer == NULL) {
         printf("Error! memory not allocated.");
         exit(0);
     }
-    for (i=0; i<n; i++) {
-        pointer[i]=step*i;
+    for (i = 0; i < n; i++) {
+        pointer[i] = step * i;
     }
-
-    return (pointer);
+    return pointer;
 }

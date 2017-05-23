@@ -37,7 +37,6 @@ int* resize(int* array, int size, int newsize)
     {
         array_ptr[i] = 0;
     }
-
-    array = array_ptr;
-    return array;
+    free(array);
+    return array_ptr;
 }
