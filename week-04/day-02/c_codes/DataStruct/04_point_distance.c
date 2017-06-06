@@ -19,7 +19,8 @@ int main()
     point_t *point = ConstructPoint(3,4);
     point_t *point1 = ConstructPoint(5,6);
     printf("%f", Distance(point, point1));
-    free(newpoint);
+    free(point);
+    free(point1);
     return 0;
 }
 point_t *ConstructPoint(int x, int y)

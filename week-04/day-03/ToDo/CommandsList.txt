@@ -1,0 +1,13 @@
+Todo application
+====================
+Commands:
+ -a   Adds a new task
+ -wr  Write current todos to file
+ -rd  Read todos from a file
+ -l   Lists all the tasks
+ -e   Empty the list
+ -r   Removes a task
+ -c   Completes a task
+ -p   Add priority to a task
+ -lp  Lists all the tasks by priority
+
