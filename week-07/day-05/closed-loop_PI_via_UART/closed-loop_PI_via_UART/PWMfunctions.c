@@ -11,6 +11,7 @@ void pwm_init()
 	TCCR2B |= (1<<CS20);
 	//OC0A is output pin (Pb3 pin)
 	DDRB |= (1 << DDRB3);
+	OCR2A = 10; 
 	
 }
 

@@ -32,7 +32,8 @@ int main(void)
 	printf("Startup...\n");
 	while (1)
 	{
-		uint8_t command;
+		duty_cycle_funct(0);
+		/*uint8_t command;
 		printf("Please enter the duty cycle in [0-100]%.\n");
 		scanf(" %d",&command);
 		printf("%d\n", command);
@@ -40,7 +41,7 @@ int main(void)
 		if (command <=100 && command >=0) 
 			duty_cycle_funct(command);
 		else
-			printf("Invalid number!\n");
+			printf("Invalid number!\n");*/
 	}
 }
 

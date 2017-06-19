@@ -21,7 +21,7 @@ int main(void)
 	/* Replace with your application code */
 	while (1)
 	{
-		duty_cycle_funct(ADC_Read() / 10.23);
+		duty_cycle_funct(ADC_Read() / 10.24);
 		//led_flasher();
 	}
 }
