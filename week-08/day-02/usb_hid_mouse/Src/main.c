@@ -104,10 +104,10 @@ int main(void) {
 	// 0b00000001 - the left mouse button is pressed
 	// 0b00000010 - the middle mouse button is pressed
 	// 0b00000100 - the right mouse button is pressed
-	HID_Buffer[0] = 0;
+	HID_Buffer[0] = 0;	// This byte contains the y realative movement
+
 	// This byte contains the x realative movement
 	HID_Buffer[1] = 0;
-	// This byte contains the y realative movement
 	HID_Buffer[2] = 0;
 
 	BSP_TS_Init(480, 272);
@@ -116,26 +116,19 @@ int main(void) {
 	TS_State.touchX[0] = 0;
 	TS_State.touchY[0] = 0;
 	uint16_t ts_x, ts_y, ts_x_, ts_y_;
-	int first = 1;
+	int touch = 0;
 
 	while (1) {
-		first = 1;
 		BSP_TS_GetState(&TS_State);
 		HID_Buffer[0] = 0;
 		HID_Buffer[1] = 0;
 		HID_Buffer[2] = 0;
 		USBD_HID_SendReport(&USBD_Device, HID_Buffer, 4);
 
-		while (TS_State.touchDetected) {
+		while (TS_State.touchDetected == 1) {
 			ts_x_ = TS_State.touchX[0];
 			ts_y_ = TS_State.touchY[0];
-			if (first)
-						{
-							ts_x = ts_x_;
-							ts_y = ts_y_;
-							first = 0;
-							continue;
-						}
+			HID_Buffer[0] = 0;
 			HID_Buffer[1] = 4 * (ts_x_ - ts_x);
 			HID_Buffer[2] = 3 * (ts_y_ - ts_y);
 			if(HID_Buffer[1] != 0 || HID_Buffer[2] != 0 || HID_Buffer[0] != 0)
@@ -145,12 +138,20 @@ int main(void) {
 			ts_x = ts_x_;
 			ts_y = ts_y_;
 
+			touch = 1;
 			BSP_TS_GetState(&TS_State);
-			if (TS_State.touchDetected == 0) {
+			if (TS_State.touchDetected == 0)
 				break;
-			} else if (TS_State.touchDetected == 1)
-				HID_Buffer[0] = 1;
 		}
+		if (TS_State.touchDetected == 0 && touch == 1) {
+			HID_Buffer[0] = 1;
+			HID_Buffer[1] = 0;
+			HID_Buffer[2] = 0;
+			touch = 0;
+			USBD_HID_SendReport(&USBD_Device, HID_Buffer, 4);
+		}
+
+
 		HAL_Delay(1);
 		//BSP_TS_ResetTouchData(&TS_State);
 	}
