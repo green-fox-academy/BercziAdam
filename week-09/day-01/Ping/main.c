@@ -4,11 +4,13 @@
 #include <winsock2.h>
 #include <time.h>
 #include "socket_functs.h"
+//#include <netdb.h> //contains struct hostent to get IP address of hostname
 
 //Create a client app that ping the google.com to get than latency, and print it out.
 
 int main(int argc , char *argv[])
 {
+    basic_server_pinging();
     struct sockaddr_in server;  //sockaddr_in structure
 
     WSADATA wsa;    //wsa structure
@@ -45,7 +47,7 @@ int main(int argc , char *argv[])
         return 1;
     }
     puts("Connected\n");
-    while (1) {     //sending data from server
+    while (1) {
         //send a message to the server
         const char message[] = "GET / HTTP/1.1\r\n\r\n";
         send(s , message , strlen(message) , 0);
@@ -75,13 +77,8 @@ int main(int argc , char *argv[])
     closesocket(s);
     WSACleanup();
 
-    struct hostent
-{
-  char *h_name;         /* Official name of host.  */
-  char **h_aliases;     /* Alias list.  */
-  int h_addrtype;       /* Host address type.  */
-  int h_length;         /* Length of address.  */
-  char **h_addr_list;       /* List of addresses from name server.  */
-};
+    //Get IP address from domain name
+
+
     return 0;
 }
