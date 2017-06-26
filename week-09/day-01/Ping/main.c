@@ -4,18 +4,19 @@
 #include <winsock2.h>
 #include <time.h>
 #include "socket_functs.h"
-//#include <netdb.h> //contains struct hostent to get IP address of hostname
 
 //Create a client app that ping the google.com to get than latency, and print it out.
 
 int main(int argc , char *argv[])
 {
-    basic_server_pinging();
+    //basic_server_pinging(); //Pinging by system command
+
     struct sockaddr_in server;  //sockaddr_in structure
 
     WSADATA wsa;    //wsa structure
 
     SOCKET s;   //socet descriptor structure
+
     printf("\nInitialising Winsock...\n");
 
     WSAStartup(MAKEWORD(2,2),&wsa);
@@ -25,6 +26,7 @@ int main(int argc , char *argv[])
         return 1;
     }
     printf("Initialised.\n");
+
 
     //creating a socket structure
     s = socket(AF_INET , SOCK_STREAM , 0 );
@@ -37,7 +39,29 @@ int main(int argc , char *argv[])
     }
     printf("Socket created.\n");
 
-    server.sin_addr.s_addr = inet_addr("172.217.18.68");  // www.google.com IP address saved in long format, read from cmd by pinging it
+    char *hostname = "www.google.com";
+    char ip[100];
+    struct hostent *he;
+    struct in_addr **addr_list;
+    int i;
+
+    if ( (he = gethostbyname( hostname ) ) == NULL) {
+        //gethostbyname failed
+        printf("gethostbyname failed : %d" , WSAGetLastError());
+        return 1;
+    }
+
+    //Cast the h_addr_list to in_addr , since h_addr_list also has the ip address in long format only
+    addr_list = (struct in_addr **) he->h_addr_list;
+
+    for(i = 0; addr_list[i] != NULL; i++)
+    {
+        //Return the first one;
+        strcpy(ip , inet_ntoa(*addr_list[i]) );
+    }
+
+    printf("%s resolved to : %s\n" , hostname , ip);
+    server.sin_addr.s_addr =inet_addr(ip); //get IP address by function gethostname
     server.sin_family = AF_INET;   //IPv4
     server.sin_port = htons( 80 ); //port number which we communicate trough
 
