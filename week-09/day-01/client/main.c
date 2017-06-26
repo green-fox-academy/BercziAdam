@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <winsock2.h>
 #include <time.h>
+#include "socket_functs.h"
 
 //Create a client app that ping the google.com to get than latency, and print it out.
 
@@ -49,9 +50,9 @@ int main(int argc , char *argv[])
         return 1;
     }
     puts("Connected\n");
-    /*while (1) {
+    //while (1) {
         //send a message to the server
-        const char message[] = "GET / HTTP/1.1\r\n\r\n";
+        const char message[] = "kaka";
         send(s , message , strlen(message) , 0);
         if( send(s , message , strlen(message) , 0) < 0)
         {
@@ -74,7 +75,7 @@ int main(int argc , char *argv[])
         //Add a NULL terminating character to make it a proper string before printing
         server_reply[recv_size] = '\0';
         puts(server_reply);
-        delay(1000);
-    }*/
+        //delay(1000);
+   // }
     return 0;
 }

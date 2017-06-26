@@ -13,6 +13,8 @@ int main(int argc , char *argv[])
     struct sockaddr_in server;
     struct sockaddr_in client;
     int c;
+    char *message;
+
 
     printf("\nInitialising Winsock...");
     if (WSAStartup(MAKEWORD(2,2),&wsa) != 0)
@@ -45,7 +47,6 @@ int main(int argc , char *argv[])
 
     puts("Bind done");
 
-    while(1) {
     //Listen to incoming connections
     listen(s , 3);
 
@@ -53,14 +54,22 @@ int main(int argc , char *argv[])
     puts("Waiting for incoming connections...");
 
     c = sizeof(struct sockaddr_in);
-    new_socket = accept(s , (struct sockaddr *)&client, &c);
-    if (new_socket == INVALID_SOCKET)
-    {
-        printf("accept failed with error code : %d" , WSAGetLastError());
+
+    while((new_socket = accept(s , (struct sockaddr *)&client, &c)) != INVALID_SOCKET) {
+        //new_socket = accept(s , (struct sockaddr *)&client, &c);
+        if (new_socket == INVALID_SOCKET) {
+            printf("accept failed with error code : %d" , WSAGetLastError());
+        }
+
+        puts("Connection accepted");
+
+        //Reply to client
+        message = "Hello Client , I have received your connection. But I have to go now, bye\n";
+        send(new_socket , message , strlen(message) , 0);
+
+        getchar();
     }
 
-    puts("Connection accepted");
-    }
     closesocket(s);
     WSACleanup();
 
