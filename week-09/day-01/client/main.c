@@ -3,14 +3,11 @@
 #include <stdlib.h>
 #include <winsock2.h>
 #include <time.h>
-#include "socket_functs.h"
 
 //Create a client app that ping the google.com to get than latency, and print it out.
 
 int main(int argc , char *argv[])
 {
-    basic_server_pinging(); //Pinging by system command
-
     struct sockaddr_in server;  //sockaddr_in structure
 
     WSADATA wsa;    //wsa structure
@@ -39,33 +36,12 @@ int main(int argc , char *argv[])
     }
     printf("Socket created.\n");
 
-    char *hostname = "www.google.com";
-    char ip[100];
-    struct hostent *he;
-    struct in_addr **addr_list;
-    int i;
 
-    if ( (he = gethostbyname( hostname ) ) == NULL) {
-        //gethostbyname failed
-        printf("gethostbyname failed : %d" , WSAGetLastError());
-        return 1;
-    }
-
-    //Cast the h_addr_list to in_addr , since h_addr_list also has the ip address in long format only
-    addr_list = (struct in_addr **) he->h_addr_list;
-
-    for(i = 0; addr_list[i] != NULL; i++)
-    {
-        //Return the first one;
-        strcpy(ip , inet_ntoa(*addr_list[i]) );
-    }
-
-    printf("%s resolved to : %s\n" , hostname , ip);
-    server.sin_addr.s_addr =inet_addr(ip); //get IP address by function gethostname
+    server.sin_addr.s_addr =inet_addr("10.27.6.195"); //localhost
     server.sin_family = AF_INET;   //IPv4
-    char port[20];
-    gets(port);
-    server.sin_port = htons( atoi(port) ); //port number which we communicate trough
+    //char port[20];
+    //gets(port);
+    server.sin_port = htons( 8888 ); //port number which we communicate trough
 
     if (connect(s , (struct sockaddr *)&server , sizeof(server)) < 0) //connecting to www.google.com server
     {
@@ -73,7 +49,7 @@ int main(int argc , char *argv[])
         return 1;
     }
     puts("Connected\n");
-    while (1) {
+    /*while (1) {
         //send a message to the server
         const char message[] = "GET / HTTP/1.1\r\n\r\n";
         send(s , message , strlen(message) , 0);
@@ -99,9 +75,6 @@ int main(int argc , char *argv[])
         server_reply[recv_size] = '\0';
         puts(server_reply);
         delay(1000);
-    }
-    closesocket(s);
-    WSACleanup();
-
+    }*/
     return 0;
 }
