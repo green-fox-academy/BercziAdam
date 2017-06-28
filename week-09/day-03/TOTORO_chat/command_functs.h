@@ -7,6 +7,6 @@
 
 void startup_com_list();
 void print_command_list();
-void client();
-void server();
 void thread_server();
+void thread_broadcast_server();
+void thread_discovery_server();

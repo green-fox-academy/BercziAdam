@@ -1,0 +1,7 @@
+#ifndef DISCOVERY_SERVER_H_INCLUDED
+#define DISCOVERY_SERVER_H_INCLUDED
+
+
+
+#endif // DISCOVERY_SERVER_H_INCLUDED
+void discovery_server();

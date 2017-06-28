@@ -1,4 +1,7 @@
 #include "command_functs.h"
+#include "broadcast.h"
+#include "message.h"
+#include "discovery_server.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <conio.h>
@@ -21,7 +24,12 @@ int main()
     startup_com_list();
     char key;
     user_t user_array[50];
+
+    _beginthread(thread_broadcast_server, 0, NULL);
+    Sleep(500);
     _beginthread(thread_server, 0, NULL);
+    Sleep(500);
+    _beginthread(thread_discovery_server, 0, NULL);
 
     while(1) {
 
@@ -43,6 +51,7 @@ int main()
 
                     break;
                 case 'd' :
+                    broadcast_send_message();
                     break;
                 case 'm' :
                     client();
