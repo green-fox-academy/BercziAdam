@@ -37,10 +37,10 @@ int main()
                     exit(0);
                     break;
                 case 'n' :
-                    exit(0);
+
                     break;
                 case 'l' :
-                    exit(0);
+
                     break;
                 case 'd' :
                     break;
