@@ -13,7 +13,7 @@ int main(int argc , char *argv[])
     struct sockaddr_in server;
     struct sockaddr_in client;
     int c;
-    char *message;
+    char message[4096];
 
 
     printf("\nInitialising Winsock...");
@@ -50,26 +50,43 @@ int main(int argc , char *argv[])
     //Listen to incoming connections
     listen(s , 3);
 
-    //Accept and incoming connection
+    //Accept an incoming connection
     puts("Waiting for incoming connections...");
 
     c = sizeof(struct sockaddr_in);
 
-    while((new_socket = accept(s , (struct sockaddr *)&client, &c)) != INVALID_SOCKET) {
-        //new_socket = accept(s , (struct sockaddr *)&client, &c);
-        if (new_socket == INVALID_SOCKET) {
-            printf("accept failed with error code : %d" , WSAGetLastError());
-        }
-
-        puts("Connection accepted");
-
-        //Reply to client
-        message = "Hello Client , I have received your connection. But I have to go now, bye\n";
-        send(new_socket , message , strlen(message) , 0);
-
-        getchar();
+    new_socket = accept(s , (struct sockaddr *)&client, &c);
+    if (new_socket == INVALID_SOCKET)
+    {
+        printf("accept failed with error code : %d" , WSAGetLastError());
     }
 
+    puts("Connection accepted");
+
+    while(1) {
+        char client_reply[4096];
+        int recv_bytes = recv(new_socket , client_reply , 4096 , 0);
+
+        if(recv_bytes == SOCKET_ERROR) {
+            puts("recv failed");
+        } else {
+            printf("client:\t");
+            client_reply[recv_bytes] = '\0'; //Add a NULL terminating character to make it a proper string before printing
+            puts(client_reply);
+        }
+        printf("server:\t");
+        gets(message);
+        message[strlen(message)] = '\0';
+        if( send(new_socket , message , strlen(message) , 0) < 0) { //Reply to client
+            puts("Send failed");
+        }
+
+
+    }
+    if (new_socket == INVALID_SOCKET) {
+        printf("accept failed with error code : %d" , WSAGetLastError());
+        return 1;
+    }
     closesocket(s);
     WSACleanup();
 
