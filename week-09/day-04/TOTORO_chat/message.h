@@ -1,9 +1,7 @@
 #ifndef MESSAGE_H_INCLUDED
 #define MESSAGE_H_INCLUDED
 
-void server();
-void client();
+void send_message();
+void message_server();
 
 #endif // MESSAGE_H_INCLUDED
-
-

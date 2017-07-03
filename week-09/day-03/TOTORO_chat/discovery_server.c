@@ -11,7 +11,6 @@
 
 void discovery_server()
 {
-    WSADATA wsa;
     SOCKET s;
     SOCKET new_socket;
     struct sockaddr_in server;
@@ -21,39 +20,12 @@ void discovery_server()
     char client_reply[4096];
     int recv_bytes;
     time_t clk;
-    char hostname[256];
-    char ip[20];
-    struct hostent *he;
-    struct in_addr **addr_list;
-    char port[6];
-    int i;
     FILE *server_log;
 
-    server_log = fopen("C:\\Users\\Adam\\Desktop\\greenfox\\BercziAdam\\week-09\\day-02\\server\\bin\\Release\\server_log.txt", "a+");
+    server_log = fopen("C:\\Users\\Adam\\Desktop\\greenfox\\BercziAdam\\week-09\\day-03\\TOTORO_chat\\discovery_server_log.txt", "a+");
     if (server_log == NULL) {
         printf("\nCannot open file \n\n");
         exit(0);
-    }
-
-    clk = time(NULL);
-    printf("%s", ctime(&clk));
-    fprintf(server_log, "\n%s", ctime(&clk));
-    printf("Initialising Winsock...\n\n");
-    fprintf(server_log, "Initialising Winsock...\n\n");
-
-    if (WSAStartup(MAKEWORD(2,2),&wsa) != 0) {
-        clk = time(NULL);
-        printf("%s", ctime(&clk));
-        fprintf(server_log, "%s", ctime(&clk));
-        printf("Failed. Error Code : %d\n\n",WSAGetLastError());
-        fprintf(server_log, "Failed. Error Code : %d\n\n",WSAGetLastError());
-        return 1;
-    } else {
-        clk = time(NULL);
-        printf("%s", ctime(&clk));
-        fprintf(server_log, "%s", ctime(&clk));
-        printf("Initialised.\n\n");
-        fprintf(server_log, "Initialised.\n\n");
     }
 
     if((s = socket(AF_INET , SOCK_STREAM , 0)) == INVALID_SOCKET) {
@@ -70,42 +42,9 @@ void discovery_server()
         fprintf(server_log, "Socket created.\n\n");
     }
 
-    printf("Please enter the hostname.\n");
-    fprintf(server_log, "Please enter the hostname.\n");
-    gets(hostname);
-    fprintf(server_log, "%s\n",hostname);
-    hostname[strlen(hostname)] = '\0';
-
-    if ( (he = gethostbyname( hostname ) ) == NULL) {
-        clk = time(NULL);
-        printf("\n%s", ctime(&clk));
-        fprintf(server_log, "\n%s", ctime(&clk));
-        printf("gethostbyname failed : %d\n\n" , WSAGetLastError());
-        fprintf(server_log, "gethostbyname failed : %d\n\n" , WSAGetLastError());
-        return 1;
-    }
-
-    addr_list = (struct in_addr **) he->h_addr_list;
-
-    for(i = 0; addr_list[i] != NULL; i++) {
-        strcpy(ip , inet_ntoa(*addr_list[i]) );
-    }
-
-    clk = time(NULL);
-    printf("\n%s", ctime(&clk));
-    fprintf(server_log, "\n%s", ctime(&clk));
-    printf("%s resolved to : %s\n\n" , hostname , ip);
-    fprintf(server_log, "%s resolved to : %s\n\n" , hostname , ip);
-
     server.sin_family = AF_INET;
-    server.sin_addr.s_addr = inet_addr(ip);
-
-    printf("Please enter a port number.\n");
-    fprintf(server_log, "Please enter a port number.\n");
-    gets(port);
-    fprintf(server_log, "%s\n", port);
-
-    server.sin_port = htons(atoi(port));
+    server.sin_addr.s_addr = htonl(INADDR_ANY);
+    server.sin_port = htons(15000);
 
     if( bind(s ,(struct sockaddr *)&server , sizeof(server)) == SOCKET_ERROR) {
         clk = time(NULL);
@@ -121,7 +60,7 @@ void discovery_server()
         fputs("Bind done.\n", server_log);
     }
 
-    listen(s , 3);
+    listen(s , 50);
 
     clk = time(NULL);
     printf("%s", ctime(&clk));
@@ -151,7 +90,7 @@ void discovery_server()
 
     while(1) {
 
-        server_log = fopen("C:\\Users\\Adam\\Desktop\\greenfox\\BercziAdam\\week-09\\day-02\\server\\bin\\Release\\server_log.txt", "a+");
+        server_log = fopen("C:\\Users\\Adam\\Desktop\\greenfox\\BercziAdam\\week-09\\day-03\\TOTORO_chat\\discovery_server_log.txt", "a+");
         if (server_log == NULL) {
             printf("Cannot open file \n\n");
             exit(0);
@@ -200,6 +139,4 @@ void discovery_server()
     closesocket(new_socket);
     WSACleanup();
     fclose(server_log);
-
-    return 0;
 }

@@ -1,13 +1,11 @@
-#include "command_functs.h"
-#include "broadcast.h"
-#include "message.h"
-#include "discovery_server.h"
+#include "main.h"
+#include "command_functs_and_init.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <process.h>
+#include <conio.h>
 #include <winsock2.h>
 #include <time.h>
-#include <windows.h>
+#include <process.h>
 
 void wsa_init()
 {
@@ -63,10 +61,10 @@ void print_command_list()
     printf("\n\n");
 }
 
-void print_user_list(user_t user_array, int user_index)
+void print_user_list()
 {
-    printf("IP address \t Discovery port number \n");
-    //for(int i = 0; i <= user_index; i++)
-        //printf("%s \t %d \n", user_array[i].discovery_port_number, user_array[i].discovery_port_number);
+    printf("User name \t IP address \t Discovery port number \t Port number\n");
+    for(int i = 0; i < user_index; i++)
+        printf("%s \t\t %x \t %d \t\t\t %d\n", user_array[user_index].name, user_array[i].ip_address,
+                user_array[i].discovery_port_number, user_array[user_index].port_number);
 }
-
