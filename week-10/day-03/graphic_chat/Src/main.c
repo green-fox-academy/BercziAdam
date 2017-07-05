@@ -100,7 +100,7 @@ int main(void)
   SystemClock_Config(); 
   
   /* Init thread */
-  osThreadDef(Start, StartThread, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 5);
+  osThreadDef(Start, StartThread, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 6);
   osThreadCreate (osThread(Start), NULL);
   
   /* Start scheduler */
@@ -134,16 +134,16 @@ static void StartThread(void const * argument)
   /* Start DHCPClient */
   osThreadDef(DHCP, DHCP_thread, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 2);
   osThreadCreate (osThread(DHCP), &gnetif);
-  osDelay(2000);
+  //osDelay(2000);
 
   // TODO:
   // Define and start the server thread
-  //osThreadDef(Servi, socket_server_thread, osPriorityBelowNormal, 0, configMINIMAL_STACK_SIZE * 2);
-  //osThreadCreate (osThread(Servi), &gnetif);
+  osThreadDef(Servi, socket_server_thread, osPriorityBelowNormal, 0, configMINIMAL_STACK_SIZE * 5);
+  osThreadCreate (osThread(Servi), &gnetif);
   //osDelay(2000);
   // TODO:
   // Define and start the client thread
-  osThreadDef(send_message, socket_client_thread, osPriorityBelowNormal, 0, configMINIMAL_STACK_SIZE * 2);
+  osThreadDef(send_message, socket_client_thread, osPriorityBelowNormal, 0, configMINIMAL_STACK_SIZE * 5);
   osThreadCreate (osThread(send_message), &gnetif);
   while (1) {
     /* Delete the Init Thread */ 
@@ -207,6 +207,15 @@ static void BSP_Config(void)
   /* Initialize LCD Log module */
   LCD_LOG_Init();
   
+  BSP_TS_Init(BSP_LCD_GetXSize(), BSP_LCD_GetYSize());
+	BSP_PB_Init(BUTTON_KEY, BUTTON_MODE_GPIO);
+	BSP_LCD_Init();
+	BSP_LCD_LayerDefaultInit(0, LCD_FB_START_ADDRESS);
+	BSP_LCD_DisplayOn();
+	BSP_LCD_SelectLayer(0);
+	BSP_LCD_Clear(LCD_COLOR_GRAY);
+	BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
+
   /* Show Header and Footer texts */
   LCD_LOG_SetHeader((uint8_t *)"TOTORO socket echo server");
   LCD_LOG_SetFooter((uint8_t *)"STM32746G-DISCO - GreenFoxAcademy");
