@@ -38,7 +38,6 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include <string.h>
-
 /** @addtogroup STM32F7xx_HAL_Examples
   * @{
   */
@@ -99,14 +98,38 @@ int main(void)
 
   /* Configure the System clock to have a frequency of 216 MHz */
   SystemClock_Config();
+  
 
 
   /* Add your application code here
      */
 
+
+  uart_handle.Instance        = DISCOVERY_COM1;
+
+  uart_handle.Init.BaudRate   = 9600;
+  uart_handle.Init.WordLength = UART_WORDLENGTH_8B;
+  uart_handle.Init.StopBits   = UART_STOPBITS_1;
+  uart_handle.Init.Parity     = UART_PARITY_NONE;
+  uart_handle.Init.HwFlowCtl  = UART_HWCONTROL_NONE;
+  uart_handle.Init.Mode       = UART_MODE_TX_RX;
+  BSP_COM_Init(COM1, &uart_handle);
+
+  if (HAL_UART_Init(&uart_handle) != HAL_OK)
+  {
+    /* Initialization Error */
+    Error_Handler();
+  }
+
+  //HAL_UART_Transmit(&uart_handle, "papa\n", 5, 0xFFFF);
+
+  printf("Startup...\n");
+
+
   /* Infinite loop */
   while (1)
   {
+
   }
 }
 
