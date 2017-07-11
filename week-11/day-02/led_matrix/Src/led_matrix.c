@@ -18,6 +18,8 @@ typedef struct {
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
+ADC_HandleTypeDef adc_handle;
+ADC_ChannelConfTypeDef adc_ch_conf;
 
 // Each LED state is stored in this 2D array
 GPIO_PinState led_matrix_state[LED_MATRIX_ROWS][LED_MATRIX_COLS];
@@ -32,6 +34,47 @@ osMutexId led_matrix_mutex_id;
 void led_matrix_set(uint8_t row, uint8_t col, uint8_t state);
 
 /* Private functions ---------------------------------------------------------*/
+
+void HAL_ADC_MspInit(ADC_HandleTypeDef *adc_handle)
+{
+	// 1 A0 PA0 ADC3_IN0
+	__HAL_RCC_ADC3_CLK_ENABLE();
+	__HAL_RCC_GPIOA_CLK_ENABLE();
+	GPIO_InitTypeDef GPIO_Init;
+	GPIO_Init.Pin = GPIO_PIN_0;
+	GPIO_Init.Speed = GPIO_SPEED_FAST;
+	GPIO_Init.Pull = GPIO_NOPULL;
+	GPIO_Init.Mode = GPIO_MODE_ANALOG;
+	HAL_GPIO_Init(GPIOA, &GPIO_Init);
+}
+void adc_init()
+{
+	adc_handle.State = HAL_ADC_STATE_RESET;
+	adc_handle.Instance = ADC3;
+	adc_handle.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV2;
+	adc_handle.Init.Resolution = ADC_RESOLUTION_12B;
+	adc_handle.Init.EOCSelection = ADC_EOC_SEQ_CONV;
+	adc_handle.Init.DMAContinuousRequests = DISABLE;
+	adc_handle.Init.DataAlign = ADC_DATAALIGN_RIGHT;
+	adc_handle.Init.ContinuousConvMode = DISABLE;
+	adc_handle.Init.DiscontinuousConvMode = DISABLE;
+	adc_handle.Init.ScanConvMode = DISABLE;
+	HAL_ADC_Init(&adc_handle);
+
+	adc_ch_conf.Channel = ADC_CHANNEL_0;
+	adc_ch_conf.Offset = 0;
+	adc_ch_conf.Rank = 1;
+	adc_ch_conf.SamplingTime = ADC_SAMPLETIME_480CYCLES;
+	HAL_ADC_ConfigChannel(&adc_handle, &adc_ch_conf);
+}
+
+uint16_t adc_measure()
+{
+	HAL_ADC_Start(&adc_handle);
+	HAL_ADC_PollForConversion(&adc_handle, HAL_MAX_DELAY);
+	return HAL_ADC_GetValue(&adc_handle);
+}
+
 
 
 void CreateMutex(void)
@@ -240,11 +283,14 @@ void led_matrix_update_thread(void const *argument)
 // This thread is a waterfall type animation
 void led_matrix_waterfall_thread(void const *argument)
 {
+	HAL_ADC_MspInit(&adc_handle);
+	adc_init();
+
 	while (1) {
 		for (uint8_t r = 0; r < LED_MATRIX_ROWS; r++) {
 			for (uint8_t c = 0; c < LED_MATRIX_COLS; c++) {
 				led_matrix_set(r, c, 1);
-				osDelay(50);
+				osDelay(adc_measure() / 40.95);
 				led_matrix_set(r, c, 0);
 			}
 		}
