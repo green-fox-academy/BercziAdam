@@ -24,6 +24,12 @@ ADC_ChannelConfTypeDef adc_ch_conf;
 // Each LED state is stored in this 2D array
 GPIO_PinState led_matrix_state[LED_MATRIX_ROWS][LED_MATRIX_COLS];
 
+//Message queue definition
+osMessageQDef(adc_message_q, 3, uint32_t);
+
+//Message queue ID
+osMessageQId adc_message_q_id;
+
 // Mutex definition
 osMutexDef(LED_MATRIX_MUTEX_DEF);
 
@@ -35,7 +41,7 @@ void led_matrix_set(uint8_t row, uint8_t col, uint8_t state);
 
 /* Private functions ---------------------------------------------------------*/
 
-void HAL_ADC_MspInit(ADC_HandleTypeDef *adc_handle)
+void adc_measure_thread(void const *argument)
 {
 	// 1 A0 PA0 ADC3_IN0
 	__HAL_RCC_ADC3_CLK_ENABLE();
@@ -46,9 +52,7 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef *adc_handle)
 	GPIO_Init.Pull = GPIO_NOPULL;
 	GPIO_Init.Mode = GPIO_MODE_ANALOG;
 	HAL_GPIO_Init(GPIOA, &GPIO_Init);
-}
-void adc_init()
-{
+
 	adc_handle.State = HAL_ADC_STATE_RESET;
 	adc_handle.Instance = ADC3;
 	adc_handle.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV2;
@@ -66,16 +70,23 @@ void adc_init()
 	adc_ch_conf.Rank = 1;
 	adc_ch_conf.SamplingTime = ADC_SAMPLETIME_480CYCLES;
 	HAL_ADC_ConfigChannel(&adc_handle, &adc_ch_conf);
+
+	adc_message_q_id = osMessageCreate(osMessageQ(adc_message_q), NULL);
+
+	while(1) {
+		HAL_ADC_Start(&adc_handle);
+		HAL_ADC_PollForConversion(&adc_handle, HAL_MAX_DELAY);
+		uint16_t adc_measure = HAL_ADC_GetValue(&adc_handle);
+		//LCD_UsrLog("%u\n", adc_measure);
+
+		osMessagePut(adc_message_q_id, adc_measure, osWaitForever);
+	}
+	// Terminating thread
+	while (1) {
+		LCD_ErrLog("ADC_MEASURE_THREAD - terminating...\n");
+		osThreadTerminate(NULL);
+	}
 }
-
-uint16_t adc_measure()
-{
-	HAL_ADC_Start(&adc_handle);
-	HAL_ADC_PollForConversion(&adc_handle, HAL_MAX_DELAY);
-	return HAL_ADC_GetValue(&adc_handle);
-}
-
-
 
 void CreateMutex(void)
 {
@@ -283,14 +294,14 @@ void led_matrix_update_thread(void const *argument)
 // This thread is a waterfall type animation
 void led_matrix_waterfall_thread(void const *argument)
 {
-	HAL_ADC_MspInit(&adc_handle);
-	adc_init();
-
 	while (1) {
 		for (uint8_t r = 0; r < LED_MATRIX_ROWS; r++) {
 			for (uint8_t c = 0; c < LED_MATRIX_COLS; c++) {
 				led_matrix_set(r, c, 1);
-				osDelay(adc_measure() / 40.95);
+				osEvent event = osMessageGet(adc_message_q_id, osWaitForever);
+				//LCD_UsrLog("value adc:%u\n", event.value.v);
+				osDelay((float)event.value.v / 40.95);
+				//osDelay(50);
 				led_matrix_set(r, c, 0);
 			}
 		}
