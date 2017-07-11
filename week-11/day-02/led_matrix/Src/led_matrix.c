@@ -20,15 +20,7 @@ typedef struct {
 /* Private variables ---------------------------------------------------------*/
 
 // Each LED state is stored in this 2D array
-GPIO_PinState led_matrix_state[LED_MATRIX_ROWS][LED_MATRIX_COLS] = {
-		{1,0,0,0,0},
-		{0,0,0,0,0},
-		{0,0,0,0,1},
-		{0,0,0,1,0},
-		{0,0,1,0,0},
-		{0,1,0,0,0},
-		{0,0,0,0,0}
-};
+GPIO_PinState led_matrix_state[LED_MATRIX_ROWS][LED_MATRIX_COLS];
 
 // Mutex definition
 osMutexDef(LED_MATRIX_MUTEX_DEF);
@@ -38,7 +30,9 @@ osMutexId led_matrix_mutex_id;
 
 /* Private function prototypes -----------------------------------------------*/
 void led_matrix_set(uint8_t row, uint8_t col, uint8_t state);
+
 /* Private functions ---------------------------------------------------------*/
+
 void CreateMutex(void)
 {
 	led_matrix_mutex_id = osMutexCreate(osMutex (LED_MATRIX_MUTEX_DEF));
@@ -72,19 +66,21 @@ void led_matrix_set(uint8_t row, uint8_t col, uint8_t state)
 {
 	// TODO:
 	// Wait for the mutex
-
+	WaitMutex();
 	// TODO:
 	// Change the LED in the selected row and col to the specified state
 	// Use the led_matrix_state 2D array variable!
-	/*for (int i = 0; i < 5; i++)  {
-		if (i % 2 == 0) {
-			for (int k = 0; k <7; k++) {
-				ledmatrix
+	for (int i = 0; i < LED_MATRIX_ROWS; i++)  {
+		for (int k = 0; k <LED_MATRIX_COLS; k++) {
+			if (k == col && i == row) {
+				led_matrix_state[i][k] = state;
 			}
 		}
-	}*/
+	}
+
 	// TODO:
 	// Release the mutex
+	ReleaseMutex(led_matrix_mutex_id);
 }
 
 
@@ -170,6 +166,16 @@ void led_matrix_update_thread(void const *argument)
 
 	HAL_GPIO_Init(GPIOI, &GPIO_InitDef);
 
+	for (int i = 0; i < LED_MATRIX_ROWS; i++) {
+		for (int k = 0; k < LED_MATRIX_COLS; k++) {
+			led_matrix_state[i][k] = GPIO_PIN_RESET;
+		}
+	}
+
+	for(int i = 0; i <LED_MATRIX_ROWS; i++) {
+		HAL_GPIO_WritePin(row_array[i].GPIOx, row_array[i].GPIO_Pin, GPIO_PIN_SET);
+	}
+	/*//LED(0;0)
 	HAL_GPIO_WritePin(column_array[0].GPIOx, column_array[0].GPIO_Pin, GPIO_PIN_SET);
 	for (int k = 0; k < LED_MATRIX_ROWS; k++) {
 		HAL_Delay(500);
@@ -179,11 +185,12 @@ void led_matrix_update_thread(void const *argument)
 			HAL_GPIO_WritePin(row_array[k].GPIOx, row_array[k].GPIO_Pin, GPIO_PIN_SET);
 		}
 	}
+	*/
 
 	// TODO:
 	// Create a mutex
 	// Use the LED_MATRIX_MUTEX_DEF
-	//CreateMutex();
+	CreateMutex();
 	LCD_UsrLog("led_matrix - initialized\n");
 
 	// Infinite loop
@@ -193,29 +200,35 @@ void led_matrix_update_thread(void const *argument)
 
 		// Step 1:
 		// Iterate through every column or row
+		for (int i = 0; i < LED_MATRIX_COLS; i++) {
 
 			// Step 2:
 			// Wait for the mutex
-			//WaitMutex();
+			WaitMutex();
 
 			// Step 3:
 			// Turn on the column or row
-
+			HAL_GPIO_WritePin(column_array[i].GPIOx, column_array[i].GPIO_Pin, GPIO_PIN_SET);
 
 			// Step 4:
 			// Turn on the leds in that column or row
-
-
+			for (int k = 0; k < LED_MATRIX_ROWS; k++) {
+				HAL_GPIO_WritePin(row_array[k].GPIOx, row_array[k].GPIO_Pin, GPIO_PIN_RESET);
+				HAL_Delay(50);
+				HAL_GPIO_WritePin(row_array[k].GPIOx, row_array[k].GPIO_Pin, GPIO_PIN_SET);
+			}
 			// Step 5:
 			// Release the mutex
-
+			ReleaseMutex(led_matrix_mutex_id);
 
 			// Step 6:
 			// Delay
-
+			HAL_Delay(200);
 
 			// Step 7:
 			// Turn off the column or row
+			HAL_GPIO_WritePin(column_array[i].GPIOx, column_array[i].GPIO_Pin, GPIO_PIN_RESET);
+		}
 	}
 
 	// Terminating thread
