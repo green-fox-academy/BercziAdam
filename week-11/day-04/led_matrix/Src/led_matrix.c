@@ -354,6 +354,8 @@ void led_matrix_touch_thread(void const *argument)
 			if (TS_State.touchX[0] > 6 * 69 && TS_State.touchY[0] > 4 * 55) {
 				HAL_GPIO_WritePin(column_array[4].GPIOx, column_array[4].GPIO_Pin, GPIO_PIN_SET);
 				HAL_GPIO_WritePin(row_array[0].GPIOx, row_array[0].GPIO_Pin, GPIO_PIN_RESET);
+			}else {
+				TS_State.touchDetected = 0;
 			}
 		}
 		HAL_GPIO_WritePin(column_array[4].GPIOx, column_array[4].GPIO_Pin, GPIO_PIN_RESET);
