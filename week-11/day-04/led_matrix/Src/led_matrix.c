@@ -324,6 +324,9 @@ void led_matrix_touch_thread(void const *argument)
 {
 	gpio_init();
 
+	int w = 69;
+	int h = 55;
+
 	TS_StateTypeDef TS_State;
 	TS_State.touchDetected = 0;
 	TS_State.touchX[0] = 0;
@@ -333,52 +336,39 @@ void led_matrix_touch_thread(void const *argument)
 	BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
 	BSP_LCD_DrawRect(1, 1, 477, 269);
 	for (int i = 1; i < LED_MATRIX_COLS; i++) {
-		BSP_LCD_DrawHLine(1, i * 55, 477);
+		BSP_LCD_DrawHLine(1, i * h, 477);
 	}
 	for (int k = 1; k < LED_MATRIX_ROWS; k++) {
-		BSP_LCD_DrawVLine(k * 69, 1, 269);
+		BSP_LCD_DrawVLine(k * w, 1, 269);
 	}
 
 	for (int i = 0; i < LED_MATRIX_COLS; i++) {
 		HAL_GPIO_WritePin(column_array[i].GPIOx, column_array[i].GPIO_Pin, GPIO_PIN_RESET);
 		for (int k = 0; k < LED_MATRIX_ROWS; k++) {
 			HAL_GPIO_WritePin(row_array[k].GPIOx, row_array[k].GPIO_Pin, GPIO_PIN_SET);
-			BSP_LCD_DrawCircle(35 + k * 69, 27 + i * 55, 20);
-			BSP_LCD_FillCircle(35 + k * 69, 27 + i * 55, 20);
+			BSP_LCD_DrawCircle(35 + k * w, 27 + i * h, 20);
+			BSP_LCD_FillCircle(35 + k * w, 27 + i * h, 20);
 		}
 	}
+
 	while (1) {
+
+		for (int i = 0; i < LED_MATRIX_COLS; i++) {
+			HAL_GPIO_WritePin(column_array[i].GPIOx, column_array[i].GPIO_Pin, GPIO_PIN_RESET);
+			for (int k = 0; k < LED_MATRIX_ROWS; k++) {
+				HAL_GPIO_WritePin(row_array[k].GPIOx, row_array[k].GPIO_Pin, GPIO_PIN_SET);
+			}
+		}
+
 		BSP_TS_GetState(&TS_State);
 		while (TS_State.touchDetected == 1) {
 			BSP_TS_GetState(&TS_State);
-			if (TS_State.touchX[0] > 6 * 69 && TS_State.touchY[0] > 4 * 55) {
-				HAL_GPIO_WritePin(column_array[4].GPIOx, column_array[4].GPIO_Pin, GPIO_PIN_SET);
-				HAL_GPIO_WritePin(row_array[0].GPIOx, row_array[0].GPIO_Pin, GPIO_PIN_RESET);
-			}else {
-				TS_State.touchDetected = 0;
-			}
+			int k = TS_State.touchX[0] / w;
+			int i = TS_State.touchY[0] / h;
+			HAL_GPIO_WritePin(column_array[i].GPIOx, column_array[i].GPIO_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(row_array[k].GPIOx, row_array[k].GPIO_Pin, GPIO_PIN_RESET);
 		}
-		HAL_GPIO_WritePin(column_array[4].GPIOx, column_array[4].GPIO_Pin, GPIO_PIN_RESET);
-
-		/*BSP_TS_GetState(&TS_State);
-
-		while (TS_State.touchDetected == 1) {
-			BSP_TS_GetState(&TS_State);
-			for (int i = 0; i < LED_MATRIX_COLS; i++) {
-				if (i * 55 + 1 < TS_State.touchX[0] && TS_State.touchX[0] < (i + 1) * 55) {
-					HAL_GPIO_WritePin(column_array[i].GPIOx, column_array[i].GPIO_Pin, GPIO_PIN_SET);
-				}
-				for(int k = LED_MATRIX_ROWS; k > 0 ; k--) {
-					if (k * 69 + 1 < TS_State.touchY[0] && TS_State.touchY[0]< (k + 1) * 69) {
-						HAL_GPIO_WritePin(row_array[k].GPIOx, row_array[k].GPIO_Pin, GPIO_PIN_RESET);
-					}
-				}
-				HAL_GPIO_WritePin(column_array[i].GPIOx, column_array[i].GPIO_Pin, GPIO_PIN_RESET);
-			}
-		}*/
-
 	}
-
 	while (1) {
 		LCD_ErrLog("led_matrix_touch_thread - terminating...\n");
 		osThreadTerminate(NULL);
