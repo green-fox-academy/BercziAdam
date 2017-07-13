@@ -19,6 +19,7 @@ typedef struct {
 ADC_HandleTypeDef adc_handle;
 ADC_ChannelConfTypeDef adc_ch_conf;
 GPIO_InitTypeDef GPIO_InitDef;
+TS_StateTypeDef TS_State;
 
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
@@ -228,9 +229,11 @@ void led_matrix_update_thread(void const *argument)
 	// Initialize the pins as outputs and the led_matrix_state 2D array
 	gpio_init();
 
+	//waterfall
 	//for(int i = 0; i <LED_MATRIX_ROWS; i++) {
 		//HAL_GPIO_WritePin(row_array[i].GPIOx, row_array[i].GPIO_Pin, GPIO_PIN_SET);
 	//}
+
 	/*//LED(0;0)
 	HAL_GPIO_WritePin(column_array[0].GPIOx, column_array[0].GPIO_Pin, GPIO_PIN_SET);
 	for (int k = 0; k < LED_MATRIX_ROWS; k++) {
@@ -256,6 +259,7 @@ void led_matrix_update_thread(void const *argument)
 
 		// Step 1:
 		// Iterate through every column or row
+
 		for (int i = 0; i < LED_MATRIX_COLS; i++) {
 
 			// Step 2:
@@ -326,8 +330,9 @@ void led_matrix_touch_thread(void const *argument)
 
 	int w = 69;
 	int h = 55;
+	int k;
+	int i;
 
-	TS_StateTypeDef TS_State;
 	TS_State.touchDetected = 0;
 	TS_State.touchX[0] = 0;
 	TS_State.touchY[0] = 0;
@@ -351,22 +356,19 @@ void led_matrix_touch_thread(void const *argument)
 		}
 	}
 
+
 	while (1) {
 
-		for (int i = 0; i < LED_MATRIX_COLS; i++) {
-			HAL_GPIO_WritePin(column_array[i].GPIOx, column_array[i].GPIO_Pin, GPIO_PIN_RESET);
-			for (int k = 0; k < LED_MATRIX_ROWS; k++) {
-				HAL_GPIO_WritePin(row_array[k].GPIOx, row_array[k].GPIO_Pin, GPIO_PIN_SET);
-			}
-		}
-
 		BSP_TS_GetState(&TS_State);
-		while (TS_State.touchDetected == 1) {
+
+		if (TS_State.touchDetected == 1) {
+
 			BSP_TS_GetState(&TS_State);
-			int k = TS_State.touchX[0] / w;
-			int i = TS_State.touchY[0] / h;
-			HAL_GPIO_WritePin(column_array[i].GPIOx, column_array[i].GPIO_Pin, GPIO_PIN_SET);
-			HAL_GPIO_WritePin(row_array[k].GPIOx, row_array[k].GPIO_Pin, GPIO_PIN_RESET);
+
+			k = TS_State.touchX[0] / w;
+			i = TS_State.touchY[0] / h;
+
+			led_matrix_set(k, i, 1);
 		}
 	}
 	while (1) {
